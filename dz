@@ -1,0 +1,76 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class UserDataApp {
+
+    public static void main(String[] args) {
+        try {
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.println("Введите данные:");
+            String input = scanner.nextLine();
+
+            String[] data = input.split("\\s+");
+
+            if (data.length != 5) {
+                throw new InputMismatchException("Неверное количество данных");
+            }
+
+            String lastName = parseString(data[0]);
+            String firstName = parseString(data[1]);
+            String middleName = parseString(data[2]);
+            String birthDate = parseDate(data[3]);
+            long phoneNumber = parsePhoneNumber(data[4]);
+            char gender = parseGender(data[5]);
+
+            String fileName = lastName + ".txt";
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+                String userData = lastName + firstName + middleName + birthDate + " " + phoneNumber + gender;
+                writer.write(userData);
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Данные успешно записаны в файл: " + fileName);
+
+        } catch (InputMismatchException | IllegalArgumentException e) {
+            System.err.println("Ошибка: " + e.getMessage());
+        }
+    }
+
+    private static String parseString(String input) {
+        if (input.matches("[a-zA-Zа-яА-Я]+")) {
+            return input;
+        } else {
+            throw new IllegalArgumentException("Неверный формат строки: " + input);
+        }
+    }
+
+    private static String parseDate(String input) {
+        if (input.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
+            return input;
+        } else {
+            throw new IllegalArgumentException("Неверный формат даты: " + input);
+        }
+    }
+
+    private static long parsePhoneNumber(String input) {
+        if (input.matches("\\d+")) {
+            return Long.parseLong(input);
+        } else {
+            throw new IllegalArgumentException("Неверный формат номера телефона: " + input);
+        }
+    }
+
+    private static char parseGender(String input) {
+        if (input.matches("[fmFM]")) {
+            return Character.toUpperCase(input.charAt(0));
+        } else {
+            throw new IllegalArgumentException("Неверный формат пола: " + input);
+        }
+    }
+}
